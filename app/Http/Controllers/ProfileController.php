@@ -38,6 +38,35 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update de club-specifieke profielgegevens (username, verjaardag, foto, bio).
+     */
+    public function updateClubProfile(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'username' => ['nullable', 'string', 'max:255'],
+            'birthday' => ['nullable', 'date'],
+            'bio' => ['nullable', 'string', 'max:1000'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+        $profile = $user->profile ?? $user->profile()->create([]);
+
+        $profile->username = $validated['username'] ?? $profile->username;
+        $profile->birthday = $validated['birthday'] ?? $profile->birthday;
+        $profile->bio = $validated['bio'] ?? $profile->bio;
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $profile->avatar_path = $path;
+        }
+
+        $profile->save();
+
+        return Redirect::route('profile.edit')->with('club-profile-updated', true);
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
