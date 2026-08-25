@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfilePageController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/leden/{user}', [ProfilePageController::class, 'show'])->name('profile.show');
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
