@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilePageController;
@@ -33,6 +34,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/nieuws/{news}/wijzigen', [NewsController::class, 'edit'])->name('news.edit');
     Route::put('/nieuws/{news}', [NewsController::class, 'update'])->name('news.update');
     Route::delete('/nieuws/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
+});
+
+// FAQ: publiek zichtbaar
+Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+
+// FAQ: enkel voor admins
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/faq-beheer', [FaqController::class, 'manage'])->name('faq.manage');
+    Route::post('/faq/categorie', [FaqController::class, 'storeCategory'])->name('faq.category.store');
+    Route::delete('/faq/categorie/{faqCategory}', [FaqController::class, 'destroyCategory'])->name('faq.category.destroy');
+    Route::post('/faq/vraag', [FaqController::class, 'storeItem'])->name('faq.item.store');
+    Route::delete('/faq/vraag/{faqItem}', [FaqController::class, 'destroyItem'])->name('faq.item.destroy');
 });
 
 require __DIR__.'/auth.php';
