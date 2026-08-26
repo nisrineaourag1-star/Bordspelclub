@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
@@ -47,5 +48,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/faq/vraag', [FaqController::class, 'storeItem'])->name('faq.item.store');
     Route::delete('/faq/vraag/{faqItem}', [FaqController::class, 'destroyItem'])->name('faq.item.destroy');
 });
+
+// Contact: publiek zichtbaar
+Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 require __DIR__.'/auth.php';
