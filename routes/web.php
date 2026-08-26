@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
@@ -52,5 +53,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Contact: publiek zichtbaar
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// Evenementen: publiek zichtbaar
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+
+// Evenementen: inschrijven/uitschrijven, enkel ingelogde gebruikers
+Route::middleware('auth')->group(function () {
+    Route::post('/events/{event}/inschrijven', [EventController::class, 'register'])->name('events.register');
+    Route::post('/events/{event}/uitschrijven', [EventController::class, 'unregister'])->name('events.unregister');
+});
 
 require __DIR__.'/auth.php';
