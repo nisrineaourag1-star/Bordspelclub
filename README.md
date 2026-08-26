@@ -1,58 +1,170 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Bordspelclub
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Bordspelclub is een website voor een fictieve bordspellenclub. Het project is gemaakt met **Laravel 13** en heeft zowel een publiek gedeelte voor bezoekers en leden als een beheergedeelte voor de administrator.
 
-## About Laravel
+Het doel van de website is om leden op een eenvoudige manier informatie te geven over de club, nieuws en evenementen te tonen en contact met de club mogelijk te maken.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Functionaliteiten
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+De website bevat onder andere de volgende functies:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* Registreren, inloggen en uitloggen
+* Wachtwoord resetten en "onthoud mij"
+* Verschillende rollen: gewone gebruiker en admin
+* Een profielpagina met username, verjaardag, profielfoto en bio
+* Nieuws bekijken via een overzicht en een detailpagina
+* Nieuws beheren als admin: toevoegen, aanpassen en verwijderen
+* FAQ's bekijken per categorie
+* FAQ-categorieën en vragen beheren als admin
+* Een contactformulier waarmee bezoekers een bericht kunnen sturen
+* Contactberichten worden via e-mail naar de admin gestuurd
+* Leden kunnen zich inschrijven en uitschrijven voor evenementen
 
-## Learning Laravel
+## Technische uitwerking
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Voor het project heb ik gebruikgemaakt van verschillende Laravel-functionaliteiten.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Onderdeel                          | Waar te vinden                                                    |
+| ---------------------------------- | ----------------------------------------------------------------- |
+| Eloquent models en relaties        | `app/Models/`                                                     |
+| One-to-many: News → Comments       | `News::comments()` in `app/Models/News.php`                       |
+| One-to-many: FaqCategory → FaqItem | `FaqCategory::items()` in `app/Models/FaqCategory.php`            |
+| Many-to-many: User ↔ Event         | `User::events()` en `Event::participants()`                       |
+| Migrations                         | `database/migrations/`                                            |
+| Seeders                            | `database/seeders/AdminUserSeeder.php` en `DemoDataSeeder.php`    |
+| Controllers                        | `app/Http/Controllers/`                                           |
+| Admin middleware                   | `app/Http/Middleware/IsAdmin.php`                                 |
+| Middleware registratie             | `bootstrap/app.php`                                               |
+| Routes                             | `routes/web.php`                                                  |
+| CSRF-bescherming                   | `@csrf` in de formulieren                                         |
+| XSS-bescherming                    | Blade escaping met `{{ }}`                                        |
+| Client-side validatie              | HTML-attributen zoals `required`, `type="email"` en `type="date"` |
+| Blade component                    | `resources/views/components/news-card.blade.php`                  |
+| Layouts                            | `resources/views/layouts/app.blade.php` en `guest.blade.php`      |
+| Contactformulier e-mail            | `app/Mail/ContactFormSubmitted.php`                               |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Modellen en relaties
 
-## Agentic Development
+De belangrijkste modellen van het project zijn:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+* `User`
+* `Profile`
+* `News`
+* `FaqCategory`
+* `FaqItem`
+* `Event`
+* `Comment`
+* `ContactMessage`
+
+Er zijn verschillende soorten relaties gebruikt. Zo heeft een nieuwsbericht meerdere comments en kan een FAQ-categorie meerdere FAQ-items bevatten.
+
+Voor evenementen is er een **many-to-many-relatie** tussen gebruikers en evenementen. Een gebruiker kan dus aan meerdere evenementen deelnemen en een evenement kan meerdere deelnemers hebben.
+
+### Admin en middleware
+
+De website maakt gebruik van een aparte `IsAdmin` middleware. Hiermee wordt gecontroleerd of een ingelogde gebruiker administrator is.
+
+De middleware staat in:
+
+`app/Http/Middleware/IsAdmin.php`
+
+De registratie van de middleware gebeurt in:
+
+`bootstrap/app.php`
+
+Daar wordt de naam `admin` gekoppeld aan de `IsAdmin` middleware. Op deze manier kunnen bepaalde routes alleen toegankelijk worden gemaakt voor admins.
+
+## Installatie
+
+Om het project lokaal te starten, kunnen de volgende stappen worden uitgevoerd.
+
+### 1. Repository clonen
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/nisrineaourag1-star/Bordspelclub.git
+cd Bordspelclub
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Dependencies installeren
 
-## Contributing
+```bash
+composer install
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. `.env` instellen
 
-## Code of Conduct
+Maak eerst een `.env` bestand aan en genereer daarna de Laravel application key.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+```
 
-## Security Vulnerabilities
+### 4. Database instellen
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Voer de migrations en seeders uit:
 
-## License
+```bash
+php artisan migrate:fresh --seed
+php artisan storage:link
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Hierdoor wordt de database aangemaakt en wordt er ook testdata toegevoegd.
+
+### 5. Website starten
+
+Bouw eerst de frontend-assets en start daarna de Laravel server:
+
+```bash
+npm run build
+php artisan serve
+```
+
+De website is daarna beschikbaar op:
+
+http://127.0.0.1:8000
+
+## Testaccounts
+
+Er is een standaard adminaccount voorzien:
+
+**Admin**
+
+* E-mail: `admin@ehb.be`
+* Wachtwoord: `Password!321`
+
+Daarnaast zijn er enkele testaccounts beschikbaar:
+
+* `sara@example.com`
+* `tom@example.com`
+* `nora@example.com`
+* `kobe@example.com`
+
+Het wachtwoord voor deze accounts is:
+
+`Password!321`
+
+## Screenshots
+
+### Nieuws
+![Nieuwsoverzicht](screenshots/nieuws.webp)
+
+### FAQ
+![Veelgestelde vragen](screenshots/faq.webp)
+
+### Evenementen
+![Evenementenoverzicht](screenshots/events.webp)
+
+### Contact
+![Contactformulier](screenshots/contact.webp)
+
+## Gebruikte bronnen
+
+Tijdens het maken van het project heb ik verschillende bronnen gebruikt:
+
+* [Laravel documentatie](https://laravel.com/docs)
+* [Laravel Breeze documentatie](https://laravel.com/docs/starter-kits#breeze)
+* Lesmateriaal van het vak Backend Web
+* AI als hulpmiddel bij het opzoeken, soms uitwerken en controleren van bepaalde onderdelen van het project
